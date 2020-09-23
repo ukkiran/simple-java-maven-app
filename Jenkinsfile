@@ -1,5 +1,5 @@
 pipeline {
-    node {
+    node (master) {
          stage('init') {
              steps {
              checkout scm
@@ -36,9 +36,7 @@ pipeline {
          }
     }
     stage('analysing code with sonarqube') {
-      sh '''
-        mvn clean package sonar:sonar
-      '''
+      sh 'mvn clean package sonar:sonar'
     }  
 }
 }
