@@ -1,12 +1,16 @@
 pipeline {
-    agent {
-         stages {
-          stage('Build') {
-            steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
+    node {
+         stage('init') {
+             steps {
+             checkout scm
+             }
           }
-          stage('Test') {
+         stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+         }
+         stage('Test') {
             steps {
                 sh 'mvn test'
             }
@@ -15,12 +19,26 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-          }
-          stage('Deliver') {
+         }
+         stage('Deliver') {
             steps {
                 sh './jenkins/scripts/deliver.sh'
             }
-          }
+         }
+    
+    stage('Build image') {
+       app = docker.build("ukkb96/myapp") 
     }
+
+    stage('push image') {
+        docker.withRegistry('https://registry.hub.docker.com', 'DOCKERHUB') {
+            app.push("latest")
+         }
+    }
+    stage('analysing code with sonarqube') {
+      sh '''
+        mvn clean package sonar:sonar
+      '''
+    }  
 }
 }
