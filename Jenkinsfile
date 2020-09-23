@@ -1,5 +1,6 @@
 pipeline {
-    node (master) {
+    agent any {
+        stages {
          stage('init') {
              steps {
              checkout scm
@@ -38,5 +39,6 @@ pipeline {
     stage('analysing code with sonarqube') {
       sh 'mvn clean package sonar:sonar'
     }  
+  }
 }
 }
