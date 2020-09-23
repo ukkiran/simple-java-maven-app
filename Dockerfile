@@ -1,9 +1,15 @@
-FROM openjdk:11-jdk-slim
 
-RUN apt-get update && apt-get upgrade
+# Build stage
 
-RUN apt-get install curl -y
+FROM maven:3.6.0-jdk-11-slim AS build
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -f /home/app/pom.xml clean package
 
-ADD target/my-app*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "app.jar" ]
+# Package stage
+
+FROM openjdk:11-jre-slim
+COPY --from=build /home/app/target/my-app-1.0-SNAPSHOT.jar /usr/local/lib/my-app-1.0-SNAPSHOT.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/usr/local/lib/my-app-1.0-SNAPSHOT.jar"]
