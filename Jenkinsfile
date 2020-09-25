@@ -33,7 +33,7 @@ pipeline {
          }
          stage('deploy to tomcat') {
             steps{
-               sh 'cp ./target/my-app-1.0-SNAPSHOT.jar /opt/tomcat/webapps/'
+               sh 'sudo cp ./target/my-app-1.0-SNAPSHOT.jar /opt/tomcat/webapps/'
             }
          }
     
