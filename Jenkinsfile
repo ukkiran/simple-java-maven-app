@@ -31,6 +31,11 @@ pipeline {
                 sh './jenkins/scripts/deliver.sh'
             }
          }
+         stage('deploy to tomcat') {
+            steps{
+               sh 'cp ./target/my-app-1.0-SNAPSHOT.jar /opt/tomcat/webapps/'
+            }
+         }
     
          stage('Build image') {
             steps{
