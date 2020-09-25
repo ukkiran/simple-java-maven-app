@@ -11,9 +11,11 @@ pipeline {
                sh 'git clone https://github.com/ukkiran/simple-java-maven-app.git'
              }
           }
-         stage('Build') {
+         stage('maven Build') {
             steps {
-                sh 'mvn clean package'
+                withMaven(maven:'jenkinsmaven'){
+                    MavenBuild()
+                }
             }
          }
          stage('Test') {
