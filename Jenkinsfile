@@ -7,42 +7,35 @@ pipeline {
      agent { label 'master' }
         stages {
           stage('cloning github repository') {
-             steps {
-               sh 'git clone https://github.com/ukkiran/simple-java-maven-app.git'
+             steps {checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github', url: 'https://github.com/ukkiran/simple-java-maven-app.git']]])
              }
           }
          stage('maven Build') {
             steps {
                 withMaven(maven:'jenkinsmaven'){
-                    MavenBuild()
+                    sh 'mvn clean package'
                 }
             }
          }
          stage('Test') {
             steps {
+                withMaven(maven:'jenkinsmaven'){
                 sh 'mvn test'
+                }
             }
             post {
                 always {
+                    withMaven(maven:'jenkinsmaven'){
                     junit 'target/surefire-reports/*.xml'
+                    }
                 }
             }
          }
-         stage('Deliver') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
-            }
-         }
-         stage('deploy to tomcat') {
-            steps{
-               sh 'sudo cp ./target/my-app-1.0-SNAPSHOT.jar /opt/tomcat/webapps/'
-            }
-         }
-    
+        
          stage('Build image') {
             steps{
                 script {
-                     docker.build registry + ":$BUILD_NUMBER"
+                    docker.build registry + ":$BUILD_NUMBER"
                 }
             }
          }
@@ -51,14 +44,10 @@ pipeline {
             steps{
                 script{
                     docker.withRegistry( '', registryCredential ) {
-                    dockerImage.push()}
+                       sh 'docker push ukkb96/myapp":$BUILD_NUMBER"'
+                    }
                 }
             }
-         }
-         stage('analysing code with sonarqube'){
-            steps{
-                sh 'mvn clean package sonar:sonar'
-            }  
          }
     }
 }
