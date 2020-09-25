@@ -1,9 +1,14 @@
 pipeline {
+    environment {
+                registry = "ukkb96/myapp"
+                registryCredential = 'dockerhub'
+                dockerImage = ''
+    }
      agent { label 'master' }
         stages {
-         stage('init') {
+          stage('cloning github repository') {
              steps {
-             checkout scm
+               sh 'git clone https://github.com/ukkiran/simple-java-maven-app.git'
              }
           }
          stage('Build') {
@@ -27,17 +32,26 @@ pipeline {
             }
          }
     
-    stage('Build image') {
-       app = docker.build("ukkb96/myapp") 
-    }
+         stage('Build image') {
+            steps{
+                script {
+                     docker.build registry + ":$BUILD_NUMBER"
+                }
+            }
+         }
 
-    stage('push image') {
-        docker.withRegistry('https://registry.hub.docker.com', 'DOCKERHUB') {
-            app.push("latest")
+         stage('push image') {
+            steps{
+                script{
+                    docker.withRegistry( '', registryCredential ) {
+                    dockerImage.push()}
+                }
+            }
+         }
+         stage('analysing code with sonarqube'){
+            steps{
+                sh 'mvn clean package sonar:sonar'
+            }  
          }
     }
-    stage('analysing code with sonarqube') {
-      sh 'mvn clean package sonar:sonar'
-    }  
-  }
 }
