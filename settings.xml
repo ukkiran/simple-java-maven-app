@@ -1,0 +1,21 @@
+<profiles>
+  <profile>
+    <id>myapp--myrepo</id>
+    <activation>
+      <activeByDefault>true</activeByDefault>
+    </activation>
+    <repositories>
+      <repository>
+        <id>myapp--myrepo</id>
+        <url>https://myapp-194180596161.d.codeartifact.us-east-1.amazonaws.com/maven/myrepo/</url>
+      </repository>
+    </repositories>
+  </profile>
+</profiles>
+<servers>
+  <server>
+    <id>myapp--myrepo</id>
+    <username>aws</username>
+    <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>
+  </server>
+</servers>
