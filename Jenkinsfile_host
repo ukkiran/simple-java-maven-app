@@ -1,0 +1,55 @@
+pipeline {
+    environment {
+                registry = "ukkb96/myapp"
+                registryCredential = 'dockerhub'
+                dockerImage = ''
+    }
+     agent { label 'master' }
+        stages {
+          stage('cloning github repository') {
+             steps {checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github', url: 'https://github.com/ukkiran/simple-java-maven-app.git']]])
+             }
+          }
+         stage('maven Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+         stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+         stage('build && SonarQube analysis') {
+             steps{
+              sh 'mvn sonar:sonar \
+                 -Dsonar.projectKey=simple-java-maven \
+                 -Dsonar.host.url=http://localhost:9000 \
+                 -Dsonar.login=ebf85f191150c94d5b24e569a351d89eb1d4de45 '
+            }
+        }
+        
+         stage('Build image') {
+            steps{
+                script {
+                    docker.build registry + ":$BUILD_NUMBER"
+                }
+            }
+         }
+
+         stage('push image') {
+            steps{
+                script{
+                    docker.withRegistry( '', registryCredential ) {
+                       sh 'docker push ukkb96/myapp":$BUILD_NUMBER"'
+                    }
+                }
+            }
+         }
+    }
+}
