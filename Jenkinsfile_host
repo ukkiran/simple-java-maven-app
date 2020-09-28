@@ -25,14 +25,11 @@ pipeline {
                 }
             }
         }
-         stage('build && SonarQube analysis') {
-             steps{
-              sh 'mvn sonar:sonar \
-                 -Dsonar.projectKey=simple-java-maven \
-                 -Dsonar.host.url=http://localhost:9000 \
-                 -Dsonar.login=ebf85f191150c94d5b24e569a351d89eb1d4de45 '
-            }
-        }
+         stage('push artifactory to jfrog') {
+            steps{
+                sh 'mvn deploy'
+             }
+         }
         
          stage('Build image') {
             steps{
@@ -51,5 +48,13 @@ pipeline {
                 }
             }
          }
+         stage('build && SonarQube analysis') {
+             steps{
+              sh 'mvn sonar:sonar \
+                 -Dsonar.projectKey=simple-java-maven \
+                 -Dsonar.host.url=http://localhost:9000 \
+                 -Dsonar.login=ebf85f191150c94d5b24e569a351d89eb1d4de45 '
+            }
+        }
     }
 }
