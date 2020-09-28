@@ -1,21 +1,28 @@
+<?xmlversion="1.0"encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <interactiveMode>false</interactiveMode>
 <profiles>
   <profile>
-    <id>myapp--myrepo</id>
+    <id>myapp</id>
     <activation>
       <activeByDefault>true</activeByDefault>
     </activation>
     <repositories>
       <repository>
-        <id>myapp--myrepo</id>
-        <url>https://myapp-194180596161.d.codeartifact.us-east-1.amazonaws.com/maven/myrepo/</url>
+        <id>myapp</id>
+        <url>http://localhost:8082/artifactory/myapp/</url>
       </repository>
     </repositories>
   </profile>
 </profiles>
 <servers>
   <server>
-    <id>myapp--myrepo</id>
-    <username>aws</username>
-    <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>
+    <id>myapp</id>
+    <username>admin</username>
+    <password>udaykiran@123</password>
   </server>
 </servers>
+</settings>
