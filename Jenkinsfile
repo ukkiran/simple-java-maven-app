@@ -36,20 +36,15 @@ pipeline {
                 withSonarQubeEnv('sonarqube') {
                     // Optionally use a Maven environment you've configured already
                       withMaven(maven:'jenkinsmaven'){
-                    sh 'mvn clean package sonar:sonar'
+                    sh 'mvn sonar:sonar \
+                        -Dsonar.projectKey=simple-java-maven \
+                        -Dsonar.host.url=http://localhost:9000 \
+                        -Dsonar.login=6fe143da9b509eb5a180112bd8c571e7ccb0530c'
                 }  
               }
             }
         }
-        stage("Quality Gate") {
-            steps{
-                timeout(time: 10, unit: 'MINUTES') {
-                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                    // true = set pipeline to UNSTABLE, false = don't
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        
          stage('Build image') {
             steps{
                 script {
